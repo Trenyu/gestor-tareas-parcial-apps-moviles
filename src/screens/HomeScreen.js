@@ -6,7 +6,7 @@
 // También permite eliminar tareas, cerrar sesión y probar una notificación local.
 
 import { useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, Button, FlatList, StyleSheet, Text, View } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
     await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
   }
 
-  // Programa una notificación local simple para probar el requisito del parcial.
+  // Muestra una notificación local simple para probar el requisito del parcial.
   async function testNotification() {
     try {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -85,15 +85,12 @@ export default function HomeScreen({ navigation }) {
           title: "Recordatorio de tarea",
           body: "Tenés tareas pendientes en tu gestor.",
         },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-          seconds: 5,
-        },
+        trigger: null,
       });
 
       Alert.alert(
-        "Notificación programada",
-        "La notificación aparecerá en 5 segundos.",
+        "Notificación enviada",
+        "Se disparó una notificación local de prueba.",
       );
     } catch (error) {
       console.log("Error al programar la notificación:", error);
@@ -103,7 +100,6 @@ export default function HomeScreen({ navigation }) {
       );
     }
   }
-
   // Cierra la sesión y vuelve al Login.
   function logout() {
     navigation.replace("Login");
@@ -123,6 +119,9 @@ export default function HomeScreen({ navigation }) {
         type="secondary"
         onPress={testNotification}
       />
+      <View style={styles.nativeButtonContainer}>
+        <Button title="Actualizar lista" onPress={loadTasks} />
+      </View>
 
       {tasks.length === 0 ? (
         <Text style={styles.emptyText}>Todavía no hay tareas cargadas.</Text>
@@ -164,5 +163,8 @@ const styles = StyleSheet.create({
   list: {
     marginTop: 20,
     marginBottom: 20,
+  },
+  nativeButtonContainer: {
+    marginBottom: 16,
   },
 });

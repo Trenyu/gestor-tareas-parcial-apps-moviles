@@ -18,9 +18,12 @@ La app permite registrar un usuario, iniciar sesión, crear tareas, visualizar u
 - Pantalla principal con listado de tareas.
 - Alta de nuevas tareas.
 - Eliminación de tareas.
+- Actualización manual de la lista de tareas.
 - Persistencia de datos usando AsyncStorage.
-- Notificación local de prueba.
+- Notificación local de prueba desde la pantalla principal.
+- Botón nativo para actualizar manualmente la lista de tareas.
 - Uso de componentes reutilizables.
+- Uso de componentes básicos de React Native como View, Text, TextInput, Button y TouchableOpacity.
 - Estilos aplicados con StyleSheet.
 
 ## Tecnologías utilizadas

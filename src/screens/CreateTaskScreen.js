@@ -83,11 +83,11 @@ export default function CreateTaskScreen({ navigation }) {
       Intentamos programar la notificación.
       Si Expo Go tiene alguna limitación, no dejamos que eso rompa la app.
     */
-      try {
-        await scheduleTaskNotification(title);
-      } catch (notificationError) {
-        console.log("No se pudo programar la notificación:", notificationError);
-      }
+      //try {
+      //  await scheduleTaskNotification(title);
+      // } catch (notificationError) {
+      //  console.log("No se pudo programar la notificación:", notificationError);
+      // }
 
       Alert.alert("Tarea guardada", "La tarea fue creada correctamente.");
 
