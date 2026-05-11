@@ -48,3 +48,51 @@ src/
 └── storage/
     └── storageKeys.js
 ```
+
+## Cómo ejecutar la app
+
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/Trenyu/gestor-tareas-parcial-apps-moviles.git
+```
+
+2. Ingresar a la carpeta del proyecto:
+
+```bash
+cd gestor-tareas-parcial-apps-moviles
+```
+
+3. Instalar las dependencias:
+
+```bash
+npm install
+```
+
+4. Ejecutar el proyecto con Expo:
+
+```bash
+npx expo start
+```
+
+5. Abrir la app:
+
+- Presionar `a` para abrirla en un emulador Android.
+- O escanear el código QR con Expo Go desde un celular.
+
+## Usuario de prueba
+
+La app permite registrar un usuario desde la pantalla de registro.
+
+Ejemplo:
+
+```text
+Usuario: fede
+Contraseña: 1234
+```
+
+## Video demo
+
+Enlace al video demo:
+
+PEGAR_ACA_LINK_DE_YOUTUBE
