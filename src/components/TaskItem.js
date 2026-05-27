@@ -13,6 +13,12 @@ export default function TaskItem({ task, onDelete }) {
         <Text style={styles.taskDate}>Creada: {task.createdAt}</Text>
       </View>
 
+
+{task.reminderDate && task.reminderTime && (
+  <Text style={styles.taskDate}>
+    Recordatorio: {task.reminderDate} {task.reminderTime}
+  </Text>
+)}
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}

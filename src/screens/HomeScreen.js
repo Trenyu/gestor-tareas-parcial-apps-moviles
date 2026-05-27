@@ -6,7 +6,7 @@
 // También permite eliminar tareas, cerrar sesión y probar una notificación local.
 
 import { useEffect, useState } from "react";
-import { Alert, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import {Button, FlatList, StyleSheet, Text, View } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
@@ -15,15 +15,7 @@ import CustomButton from "../components/CustomButton";
 import TaskItem from "../components/TaskItem";
 import { TASKS_KEY } from "../storage/storageKeys";
 
-// Configuración para que la notificación se muestre cuando la app está abierta.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+
 
 export default function HomeScreen({ navigation }) {
   // Estado donde guardamos la lista de tareas.
@@ -67,39 +59,7 @@ export default function HomeScreen({ navigation }) {
     await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
   }
 
-  // Muestra una notificación local simple para probar el requisito del parcial.
-  async function testNotification() {
-    try {
-      const { status } = await Notifications.requestPermissionsAsync();
-
-      if (status !== "granted") {
-        Alert.alert(
-          "Permiso requerido",
-          "Para recibir recordatorios, habilitá las notificaciones.",
-        );
-        return;
-      }
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Recordatorio de tarea",
-          body: "Tenés tareas pendientes en tu gestor.",
-        },
-        trigger: null,
-      });
-
-      Alert.alert(
-        "Notificación enviada",
-        "Se disparó una notificación local de prueba.",
-      );
-    } catch (error) {
-      console.log("Error al programar la notificación:", error);
-      Alert.alert(
-        "Aviso",
-        "No se pudo mostrar la notificación en Expo Go, pero la función está implementada.",
-      );
-    }
-  }
+ 
   // Cierra la sesión y vuelve al Login.
   function logout() {
     navigation.replace("Login");
@@ -114,11 +74,7 @@ export default function HomeScreen({ navigation }) {
         onPress={() => navigation.navigate("CrearTarea")}
       />
 
-      <CustomButton
-        title="Probar notificación"
-        type="secondary"
-        onPress={testNotification}
-      />
+      
       <View style={styles.nativeButtonContainer}>
         <Button title="Actualizar lista" onPress={loadTasks} />
       </View>

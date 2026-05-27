@@ -2,10 +2,16 @@
 
 // Pantalla para crear una nueva tarea.
 // Guarda la tarea en AsyncStorage.
-// También programa una notificación local simple.
+// Permite programar una notificación local para una fecha y hora específica.
 
-import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+} from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
@@ -13,14 +19,28 @@ import * as Notifications from "expo-notifications";
 import CustomButton from "../components/CustomButton";
 import { TASKS_KEY } from "../storage/storageKeys";
 
+// Configuración para que la notificación se vea incluso si la app está abierta.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function CreateTaskScreen({ navigation }) {
   // Estado para guardar el título que escribe el usuario.
   const [title, setTitle] = useState("");
 
-  /*
-    Cuando se carga la pantalla, pedimos permiso para mostrar notificaciones.
-    En Android suele funcionar directo, pero igual es buena práctica pedirlo.
-  */
+  // Estado para guardar la fecha del recordatorio.
+  // Formato esperado: YYYY-MM-DD
+  const [reminderDate, setReminderDate] = useState("");
+
+  // Estado para guardar la hora del recordatorio.
+  // Formato esperado: HH:mm
+  const [reminderTime, setReminderTime] = useState("");
+
   useEffect(() => {
     requestNotificationPermissions();
   }, []);
@@ -32,82 +52,138 @@ export default function CreateTaskScreen({ navigation }) {
     if (status !== "granted") {
       Alert.alert(
         "Permiso requerido",
-        "Para recibir recordatorios, habilitá las notificaciones.",
+        "Para recibir recordatorios, habilitá las notificaciones."
       );
     }
   }
 
-  // Programa una notificación local a los 5 segundos.
-  async function scheduleTaskNotification(taskTitle) {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Nueva tarea creada",
-        body: `Recordatorio: ${taskTitle}`,
-      },
-      trigger: {
-        seconds: 5,
-      },
-    });
+  // Valida que la fecha y hora tengan un formato correcto.
+  function buildReminderDate() {
+    // Ejemplo esperado:
+    // reminderDate = "2026-05-28"
+    // reminderTime = "16:30"
+
+      const cleanDate = reminderDate.trim();
+      const cleanTime = reminderTime.trim();
+
+      const dateTimeText = `${cleanDate}T${cleanTime}:00`;
+      const selectedDate = new Date(dateTimeText);
+    // Validamos que JavaScript haya podido crear una fecha válida.
+    if (isNaN(selectedDate.getTime())) {
+    return null;
   }
+
+  return selectedDate;
+}
+
+  // Programa una notificación local para una fecha y hora específica.
+  async function scheduleTaskNotification(taskTitle, selectedDate) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Recordatorio de tarea",
+      body: `Tenés pendiente: ${taskTitle}`,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: selectedDate,
+    },
+  });
+}
 
   // Guarda la tarea nueva.
   async function saveTask() {
-    // Validamos que el campo no esté vacío.
     if (!title.trim()) {
       Alert.alert("Error", "Ingresá el título de la tarea.");
       return;
     }
 
-    try {
-      // Buscamos las tareas ya guardadas.
-      const storedTasks = await AsyncStorage.getItem(TASKS_KEY);
+    if (!reminderDate.trim() || !reminderTime.trim()) {
+      Alert.alert(
+        "Error",
+        "Ingresá la fecha y hora del recordatorio."
+      );
+      return;
+    }
 
-      // Si hay tareas guardadas, las convertimos a array.
-      // Si no hay, arrancamos con un array vacío.
+    const selectedDate = buildReminderDate();
+
+    if (!selectedDate) {
+      Alert.alert(
+        "Error",
+        "La fecha u hora no tienen un formato válido. Usá fecha YYYY-MM-DD y hora HH:mm."
+      );
+      return;
+    }
+
+    const now = new Date();
+
+    if (selectedDate <= now) {
+      Alert.alert(
+        "Error",
+        "La fecha y hora del recordatorio deben ser posteriores al momento actual."
+      );
+      return;
+    }
+
+    try {
+      const storedTasks = await AsyncStorage.getItem(TASKS_KEY);
       const currentTasks = storedTasks ? JSON.parse(storedTasks) : [];
 
-      // Creamos una nueva tarea.
       const newTask = {
         id: Date.now().toString(),
         title: title,
         createdAt: new Date().toLocaleDateString(),
+        reminderDate: reminderDate,
+        reminderTime: reminderTime,
       };
 
-      // Agregamos la nueva tarea a la lista anterior.
       const updatedTasks = [...currentTasks, newTask];
 
-      // Guardamos la lista actualizada en AsyncStorage.
       await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
 
-      /*
-      Intentamos programar la notificación.
-      Si Expo Go tiene alguna limitación, no dejamos que eso rompa la app.
-    */
-      //try {
-      //  await scheduleTaskNotification(title);
-      // } catch (notificationError) {
-      //  console.log("No se pudo programar la notificación:", notificationError);
-      // }
+      await scheduleTaskNotification(title, selectedDate);
 
-      Alert.alert("Tarea guardada", "La tarea fue creada correctamente.");
+      Alert.alert(
+        "Tarea guardada",
+        "La tarea fue creada y el recordatorio quedó programado."
+      );
 
-      // Volvemos al Home.
       navigation.navigate("Home");
     } catch (error) {
       console.log("Error al guardar la tarea:", error);
       Alert.alert("Error", "No se pudo guardar la tarea.");
     }
   }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Nueva tarea</Text>
-      <Text style={styles.subtitle}>Cargá una tarea pendiente</Text>
+      <Text style={styles.subtitle}>
+        Cargá una tarea y programá un recordatorio
+      </Text>
 
       <TextInput
         style={styles.input}
         placeholder="Ejemplo: Estudiar React Native"
+        placeholderTextColor="#6B7280"
         value={title}
         onChangeText={setTitle}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Fecha del recordatorio: 2026-05-28"
+        placeholderTextColor="#6B7280"
+        value={reminderDate}
+        onChangeText={setReminderDate}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Hora del recordatorio: 16:30"
+        placeholderTextColor="#6B7280"
+        value={reminderTime}
+        onChangeText={setReminderTime}
       />
 
       <CustomButton title="Guardar tarea" onPress={saveTask} />
@@ -149,5 +225,7 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 14,
     fontSize: 16,
+    color: "#111827",
+    fontWeight: "500",
   },
 });
