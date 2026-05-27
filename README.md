@@ -8,7 +8,7 @@ Gestor de tareas.
 
 Aplicación móvil desarrollada con React Native y Expo para gestionar tareas simples.
 
-La app permite registrar un usuario, iniciar sesión, crear tareas, visualizar una lista de tareas, eliminar tareas y probar una notificación local.
+La app permite registrar un usuario, iniciar sesión, crear tareas, visualizar una lista de tareas, eliminar tareas y programar recordatorios con notificaciones locales para una fecha y hora específica.
 
 ## Funcionalidades implementadas
 
@@ -17,11 +17,12 @@ La app permite registrar un usuario, iniciar sesión, crear tareas, visualizar u
 - Navegación con Stack Navigation.
 - Pantalla principal con listado de tareas.
 - Alta de nuevas tareas.
+- Carga de fecha y hora para recordatorio.
+- Programación de notificación local al crear una tarea.
+- Visualización del recordatorio asociado a cada tarea.
 - Eliminación de tareas.
 - Actualización manual de la lista de tareas.
 - Persistencia de datos usando AsyncStorage.
-- Notificación local de prueba desde la pantalla principal.
-- Botón nativo para actualizar manualmente la lista de tareas.
 - Uso de componentes reutilizables.
 - Uso de componentes básicos de React Native como View, Text, TextInput, Button y TouchableOpacity.
 - Estilos aplicados con StyleSheet.
@@ -83,6 +84,19 @@ npx expo start
 - Presionar `a` para abrirla en un emulador Android.
 - O escanear el código QR con Expo Go desde un celular.
 
+## Uso de la app
+
+1. Crear un usuario desde la pantalla de registro.
+2. Iniciar sesión con el usuario registrado.
+3. Ingresar a la pantalla principal.
+4. Crear una nueva tarea.
+5. Completar:
+   - Título de la tarea.
+   - Fecha del recordatorio con formato `YYYY-MM-DD`.
+   - Hora del recordatorio con formato `HH:mm`.
+6. Guardar la tarea.
+7. La tarea queda almacenada localmente y se programa una notificación para la fecha y hora indicada.
+
 ## Usuario de prueba
 
 La app permite registrar un usuario desde la pantalla de registro.
@@ -98,4 +112,4 @@ Contraseña: 1234
 
 Enlace al video demo:
 
-https://youtu.be/Axl4NLKwhPk
+https://www.youtube.com/watch?v=Axl4NLKwhPk
